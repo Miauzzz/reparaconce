@@ -1,0 +1,130 @@
+---
+import '../styles/global.css';
+import { ClientRouter } from 'astro:transitions';
+
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+<!doctype html>
+<html lang="es" class="h-full overflow-hidden dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Iceberg&display=swap" rel="stylesheet">
+    <title>{title}</title>
+    <ClientRouter />
+  </head>
+
+  <body class="m-0 p-0 w-screen h-screen flex flex-col overflow-hidden bg-background-theme text-text-theme">
+  <div class="absolute top-0 z-[-2] h-full w-full bg-[radial-gradient(100%_50%_at_50%_0%,rgba(0,163,255,0.13)_0,rgba(0,163,255,0)_50%,rgba(0,163,255,0)_100%)] pointer-events-none"></div>
+  <header class="w-full shrink-0 border-b border-solid [border-image:linear-gradient(to_right,transparent,gray,transparent)1] z-20">
+    <div class="container mx-auto px-4 max-w-6xl py-3 flex flex-row justify-between items-center">
+      <div class="flex flex-row items-center gap-3 ">
+        <div class="absolute -z-10 w-10 h-8 rounded-full bg-cyan-500/40 blur-md scale-100 animate-pulse"></div>
+        <img src="/logo.webp" alt="Tecnoconce Logo" class="w-10 h-auto pointer-events-none select-none">
+        <p class="text-xl font-iceberg text-primary-theme pointer-events-none select-none">TECNOCONCE</p>
+        <button
+  id="theme-toggle"
+  type="button"
+  class="relative inline-flex h-8 w-14 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-slate-300 transition-colors duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 dark:bg-slate-700"
+  role="switch"
+  aria-checked="false"
+  aria-label="Cambiar tema"
+>
+  <!-- Bola deslizante con los íconos -->
+  <span
+    id="theme-toggle-handle"
+    class="pointer-events-none relative inline-block h-7 w-7 transform rounded-full bg-white shadow-md ring-0 transition duration-300 ease-in-out translate-x-0 dark:translate-x-6 dark:bg-slate-900"
+  >
+    <!-- Ícono del Sol (Visible en modo claro) -->
+    <svg
+      id="sun-icon"
+      class="absolute inset-0 h-full w-full p-1 text-amber-500 opacity-100 transition-opacity duration-200 ease-in dark:opacity-0"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      stroke-width="2"
+    >
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+    </svg>
+
+    <!-- Ícono de la Luna (Visible en modo oscuro) -->
+    <svg
+      id="moon-icon"
+      class="absolute inset-0 h-full w-full p-1 text-cyan-400 opacity-0 transition-opacity duration-200 ease-in dark:opacity-100"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      stroke-width="2"
+    >
+      <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+    </svg>
+  </span>
+</button>
+        
+      </div>
+
+      <nav class="flex flex-row gap-6 md:gap-10">
+        <a href="/" class="transition-colors">Inicio</a>
+        <a href="/servicios" class="transition-colors">Servicios</a>
+        <a href="/contacto" class="transition-colors">Contacto</a>
+        <a href="/faq" class="transition-colors">Preguntas frecuentes</a>
+      </nav>
+    </div>
+    </header>
+
+    <main class="flex-1 relative overflow-hidden">
+      <slot />
+    </main>
+
+    <footer class="w-full shrink-0 border-t border-black/5">
+      <div class="container mx-auto px-4 max-w-6xl py-3 text-center">
+        <p class="text-sm">
+          El mejor servicio técnico de Concepción.
+        </p>
+      </div>
+    </footer>
+
+    <script is:inline>
+      const setInitialTheme = () => {
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const isDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
+        
+        if (isDark) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      };
+    
+      setInitialTheme();
+    
+      document.addEventListener('DOMContentLoaded', () => {
+        const toggleBtn = document.getElementById('theme-toggle');
+    
+        const updateAriaState = () => {
+          const isDark = document.documentElement.classList.contains('dark');
+          toggleBtn?.setAttribute('aria-checked', isDark ? 'true' : 'false');
+        };
+    
+        updateAriaState();
+    
+        toggleBtn?.addEventListener('click', () => {
+          const isDark = document.documentElement.classList.toggle('dark');
+          localStorage.setItem('theme', isDark ? 'dark' : 'light');
+          updateAriaState();
+        });
+      });
+    </script>
+    
+  </body>
+</html>

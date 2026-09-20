@@ -1,0 +1,83 @@
+---
+
+interface Props {
+  videos: string[];
+  interval?: number; // Tiempo en milisegundos entre cada cambio
+}
+
+const { 
+  videos = [
+    '/videos/bg-1.webm',
+    '/videos/bg-2.webm',
+    '/videos/bg-3.webm',
+    '/videos/bg-4.webm'
+  ], 
+  interval = 6000 
+} = Astro.props;
+---
+
+<!-- src/components/BackgroundVideos.astro -->
+<div class="relative w-full h-full overflow-hidden bg-background-theme pointer-events-none select-none ">
+    <video 
+      id="video-a" 
+      autoplay 
+      muted 
+      playsinline 
+      class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 opacity-100"
+    ></video>
+  
+    <video 
+      id="video-b" 
+      autoplay 
+      muted 
+      playsinline 
+      class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 opacity-0"
+    ></video>
+  </div>
+  
+  <script define:vars={{ videos, interval }}>
+    let intervalId = null;
+  
+    function initVideos() {
+      const videoA = document.getElementById('video-a');
+      const videoB = document.getElementById('video-b');
+  
+      // Si no existen los videos en esta página, salir
+      if (!videoA || !videoB) return;
+  
+      // Limpiar intervalo anterior si existía para evitar duplicados
+      if (intervalId) clearInterval(intervalId);
+  
+      let currentIndex = 0;
+      let activeVideo = videoA;
+      let inactiveVideo = videoB;
+  
+      // Asignar primer video y reproducir explícitamente
+      videoA.src = videos[0];
+      videoA.play().catch(() => {});
+  
+      intervalId = setInterval(() => {
+        currentIndex = (currentIndex + 1) % videos.length;
+  
+        inactiveVideo.src = videos[currentIndex];
+        inactiveVideo.play().catch(() => {});
+  
+        inactiveVideo.classList.remove('opacity-0');
+        inactiveVideo.classList.add('opacity-100');
+  
+        activeVideo.classList.remove('opacity-100');
+        activeVideo.classList.add('opacity-0');
+  
+        // Intercambiar referencias
+        const temp = activeVideo;
+        activeVideo = inactiveVideo;
+        inactiveVideo = temp;
+      }, interval);
+    }
+  
+    // 1. Ejecutar en la carga inicial
+    initVideos();
+  
+    // 2. Ejecutar cada vez que Astro cambia de página con View Transitions
+    document.addEventListener('astro:page-load', initVideos);
+  </script>

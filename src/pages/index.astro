@@ -1,0 +1,25 @@
+---
+import Layout from '../layouts/Layout.astro';
+import BackgroundVideos from '../components/BackgroundVideos.astro';
+import Hero from '../components/sections/Hero.astro';
+
+const misVideos = [
+  '/videos/video4.webm',
+  '/videos/video1.webm',
+  '/videos/video3.webm',
+  '/videos/video2.webm'
+];
+---
+
+<Layout title="ReparaCCP - TECNOCONCE">
+  <section transition:animate="fade" class="relative w-full h-full min-h-125 flex items-center justify-center overflow-hidden">
+    
+    <div class="absolute inset-0 -z-10 transition:persist video-mask">
+      <BackgroundVideos videos={misVideos} interval={5000} />
+      <div class="absolute inset-0 bg-black/80 backdrop-blur-xs z-10"></div>
+    </div>
+
+    <Hero />
+
+  </section>
+</Layout>
