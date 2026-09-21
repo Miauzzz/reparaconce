@@ -1,0 +1,86 @@
+---
+import { Icon } from 'astro-icon/components';
+import "../../styles/global.css";
+---
+<!-- Switch para el dark/light theme -->
+<div class="flex flex-row gap-2 items-center justify-center">
+      <Icon name="akar-icons:sun-fill" class="w-6 h-6 text-purple-900 dark:text-yellow-300 transition-colors delay-100 duration-200"/>
+      <label class="relative cursor-pointer">
+            <input type="checkbox" role="switch" id="theme-toggle" class="sr-only peer" />
+
+            <div class="w-9 h-5 bg-slate-300 rounded-md
+                  peer-checked:bg-blue-300
+                  peer-focus-visible:ring-2
+                  peer-focus-visible:ring-blue-300
+                  transition-colors dark:bg-neutral-700">
+            </div>
+
+            <div class="absolute left-0.5 top-0.5 w-[15.5px] h-[15.5px] bg-stone-700 dark:bg-white rounded-full
+                  transition-transform peer-checked:translate-x-4">
+            </div>
+      </label>
+      <Icon name="akar-icons:moon-fill" class="w-6 h-6 text-yellow-300 dark:text-purple-900 transition-colors delay-100 duration-200"/>
+</div>
+
+<script is:inline>
+      const handleThemeChange = (e) => {
+        const checked = e.target.checked;
+        const toggleBtn = e.target;
+    
+        if (checked) {
+          document.documentElement.classList.add('dark');
+          localStorage.setItem('theme', 'dark');
+          toggleBtn.setAttribute('aria-checked', 'true');
+        } else {
+          document.documentElement.classList.remove('dark');
+          localStorage.setItem('theme', 'light');
+          toggleBtn.setAttribute('aria-checked', 'false');
+        }
+      };
+    
+      const setupTheme = () => {
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const isDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
+        
+        // 1. Aplicar clase al documento inmediatamente
+        if (isDark) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+    
+        // 2. Sincronizar el botón en la página actual
+        const toggleBtn = document.getElementById('theme-toggle');
+        if (!toggleBtn) return;
+    
+        // --- TRUCO AQUÍ: Desactivar transiciones temporalmente ---
+        toggleBtn.style.transition = 'none';
+        const thumb = toggleBtn.parentElement.querySelector('div:nth-child(2)'); // O el contenedor móvil del switch
+        if (thumb) thumb.style.transition = 'none';
+    
+        toggleBtn.checked = isDark;
+        toggleBtn.setAttribute('aria-checked', isDark ? 'true' : 'false');
+    
+        // Forzar un reflow para que el navegador aplique el cambio sin animación
+        void toggleBtn.offsetHeight;
+    
+        // Restaurar las transiciones
+        toggleBtn.style.transition = '';
+        if (thumb) thumb.style.transition = '';
+        // --------------------------------------------------------
+    
+        // Remover listener anterior para evitar duplicados al navegar
+        toggleBtn.removeEventListener('change', handleThemeChange);
+        toggleBtn.addEventListener('change', handleThemeChange);
+      };
+    
+      // Ejecución inicial (evita FOUC)
+      setupTheme();
+    
+      // Para carga inicial tradicional
+      document.addEventListener('DOMContentLoaded', setupTheme);
+    
+      // Vital para Astro con View Transitions
+      document.addEventListener('astro:page-load', setupTheme);
+    </script>

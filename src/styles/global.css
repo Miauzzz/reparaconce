@@ -1,17 +1,20 @@
 @import "tailwindcss";
 
 .font-iceberg {
-    font-family: "Iceberg", sans-serif;
-    font-weight: 400;
-    font-style: normal;
-  }
-  
-.font-ibm {
-font-family: "IBM Plex Serif", serif;
-font-weight: 400;
-font-style: normal;
+  font-family: "Iceberg", sans-serif;
+  font-weight: 400;
+  font-style: normal;
 }
 
+.font-ibm {
+  font-family: "IBM Plex Serif", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+
+
+@custom-variant dark (&:where(.dark, .dark *));
 @theme {
   /* Mapeo de la paleta para que Tailwind cree clases como bg-primary-500, text-text-900, etc. */
   --color-text-50: var(--text-50);
