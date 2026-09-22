@@ -1,0 +1,79 @@
+---
+import Layout from '../../layouts/Layout.astro'; 
+
+// 1. Definimos los datos de todos tus servicios en un solo lugar (un array o objeto)
+const servicesData = {
+  'formateo': {
+    title: 'Formateo y Mantención',
+    description: 'Instalación limpia de sistema operativo y limpieza física.',
+    content: 'Aquí va todo el texto largo, precios, especificaciones del formateo...'
+  },
+  'recuperacion': {
+    title: 'Recuperación de Datos',
+    description: 'Rescate de información desde discos dañados o eliminados.',
+    content: 'Aquí va toda la info detallada sobre cómo recuperamos tus archivos...'
+  },
+  'reparacion-hardware': {
+    title: 'Reparación de Hardware',
+    description: 'Cambio de pantallas, baterías, pines de carga y más.',
+    content: 'Detalles técnicos sobre reemplazo de piezas físicas...'
+  }
+};
+
+// 2. Astro requiere esta función para saber qué URLs (slugs) debe generar estáticamente
+export async function getStaticPaths() {
+  const services = [
+    { slug: 'formateo' },
+    { slug: 'recuperacion' },
+    { slug: 'reparacion-hardware' },
+  ];
+
+  return services.map((service) => {
+    return {
+      params: { slug: service.slug },
+    };
+  });
+}
+
+// 3. Obtenemos el slug de la URL actual
+const { slug } = Astro.params;
+const service = servicesData[slug as keyof typeof servicesData];
+
+// Si alguien entra a una URL que no existe en el objeto, devolvemos un 404
+if (!service) {
+  return Astro.redirect('/404');
+}
+---
+
+<Layout title={service.title}>
+  <main class="max-w-4xl mx-auto p-6 space-y-8">
+    
+    <!-- Navegación entre servicios (Tus "Cards" que actúan como enlaces) -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      {Object.entries(servicesData).map(([key, value]) => (
+        <a 
+          href={`/servicios/${key}`}
+          class={`p-4 rounded-xl border transition-all block ${
+            slug === key 
+              ? 'border-blue-300 dark:border-red-300 bg-blue-50/50 dark:bg-blue-950/30 ring-2 ring-blue-500/20 dark:ring-red-500/20' 
+              : 'border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:border-zinc-400'
+          }`}
+        >
+          <h3 class="font-semibold text-zinc-900 dark:text-white">{value.title}</h3>
+          <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1">{value.description}</p>
+        </a>
+      ))}
+    </div>
+
+    <!-- Contenedor del Servicio Actual (Renderizado dinámico según la URL) -->
+    <section class="bg-zinc-50 dark:bg-zinc-900/50 p-8 rounded-2xl border border-zinc-200 dark:border-zinc-800 space-y-4 " transition:animate="slide">
+      <h1 class="text-3xl font-extrabold text-zinc-900 dark:text-white">{service.title}</h1>
+      <p class="text-lg text-zinc-600 dark:text-zinc-400">{service.description}</p>
+      <hr class="border-zinc-200 dark:border-zinc-800" />
+      <div class="text-zinc-700 dark:text-zinc-300 leading-relaxed">
+        <p>{service.content}</p>
+      </div>
+    </section>
+
+  </main>
+</Layout>

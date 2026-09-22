@@ -15,6 +15,7 @@
 
 
 @custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   /* Mapeo de la paleta para que Tailwind cree clases como bg-primary-500, text-text-900, etc. */
   --color-text-50: var(--text-50);

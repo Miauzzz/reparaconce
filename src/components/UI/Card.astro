@@ -5,9 +5,9 @@ const { image, title, description } = Astro.props;
 <!-- Cambiamos <card> por un <div> con flex para que los elementos internos se distribuyan bien -->
 <div class="flex flex-col border rounded-md p-4 bg-background-theme/5 shadow-md h-full">
     <img src={image} alt={title} class="w-full h-48 object-cover rounded-md mb-3" />
-    <h1 class="text-lg font-bold mb-2">{title}</h1>
+    <h1 class="text-lg text-center font-bold mb-2">{title}</h1>
     
-    <div class="border border-black/10 mb-2"></div>
+    <div class="border border-black/10  mb-2"></div>
 
     <!-- Usamos flex-1 para que el texto ocupe el espacio disponible y empuje todo de forma uniforme -->
     <p class="text-sm opacity-90 flex-1">{description}</p>

@@ -3,19 +3,23 @@ import '../../styles/global.css';
 import Card from '../UI/Card.astro';
 ---
 
-<main transition:animate="fade" class="w-full min-h-190 m-auto flex items-center justify-center p-6">
-    <!-- Contenedor con Grid responsive y ancho máximo -->
+<main transition:animate="fade">
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl w-full">
-        <Card 
-            image="../imagenes/image0.webp" 
-            title="Imagén de prueba" 
-            description="Reparación de aparatos electrónicos, Televisores, Equipos de sonido." 
-        />
+        <a href="/" class="hover:bg-primary-theme" data-target="servtec">
+            <Card 
+                image="../imagenes/cat-servtec.webp" 
+                title="Servicio Técnico" 
+                description="Reparación de aparatos electrónicos, Televisores, Equipos de sonido." 
+            />
+        </a>
+
+        <a href="/servicios/formateo" class="hover:bg-primary-theme" data-target="servcomp">
+            <Card 
+                image="../imagenes/cat-servcomp.webp" 
+                title="Servicios Computacionales" 
+                description="Formateos, Cambios de disco duro (M.2 / SSD / HDD), Mantención a profundidad + Cambio de pasta térmica." 
+            />
+        </a>
         
-        <Card 
-            image="../imagenes/image0.webp" 
-            title="Servicios Computacionales" 
-            description="Formateos, Cambios de disco duro (M.2 / SSD / HDD), Mantención a profundidad + Cambio de pasta térmica." 
-        />
     </div>
 </main>

@@ -2,7 +2,6 @@
 import '../styles/global.css';
 import { ClientRouter } from 'astro:transitions';
 import SwitchDark from '../components/UI/SwitchDark.astro';
-import { Icon } from 'astro-icon/components';
 
 interface Props {
   title: string;
@@ -31,7 +30,7 @@ const { title } = Astro.props;
   <header class="w-full shrink-0 border-b border-solid [border-image:linear-gradient(to_right,transparent,gray,transparent)1] z-20">
     <div class="container mx-auto px-4 max-w-6xl py-3 flex flex-row justify-between items-center">
       <div class="flex flex-row items-center gap-3 ">
-        <div class="absolute -z-10 w-10 h-8 rounded-full bg-cyan-500/40 blur-md scale-100 animate-pulse"></div>
+        <div class="absolute -z-10 w-10 h-8 rounded-full bg-cyan-500/90 dark:bg-red-300 blur-md scale-100 animate-pulse"></div>
         <img src="/logo.webp" alt="Tecnoconce Logo" class="w-10 h-auto pointer-events-none select-none">
         <a href="/" class="text-xl font-iceberg text-primary-theme pointer-events-none select-none">TECNOCONCE</a>
       </div>
