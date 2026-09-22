@@ -1,72 +1,126 @@
 ---
 import Layout from '../../layouts/Layout.astro'; 
 
-// 1. Definimos los datos de todos tus servicios en un solo lugar (un array o objeto)
-const servicesData = {
-  'formateo': {
-    title: 'Formateo y Mantención',
-    description: 'Instalación limpia de sistema operativo y limpieza física.',
-    content: 'Aquí va todo el texto largo, precios, especificaciones del formateo...'
+// 1. Definimos la estructura de datos con tipado estricto
+interface Service {
+  title: string;
+  description: string;
+  content: string;
+}
+
+interface Category {
+  title: string;
+  services: Record<string, Service>;
+}
+
+const categories: Record<string, Category> = {
+  servcomp: {
+    title: "Servicios de Computación",
+    services: {
+      'formateo': {
+        title: 'Formateo y Mantención',
+        description: 'Instalación limpia de sistema operativo y limpieza física.',
+        content: 'Aquí va todo el texto largo, precios, especificaciones del formateo...'
+      },
+      'recuperacion': {
+        title: 'Recuperación de Datos',
+        description: 'Rescate de información desde discos dañados o eliminados.',
+        content: 'Aquí va toda la info detallada sobre cómo recuperamos tus archivos...'
+      },
+      'reparacion-hardware': {
+        title: 'Reparación de Hardware',
+        description: 'Cambio de pantallas, baterías, pines de carga y más.',
+        content: 'Detalles técnicos sobre reemplazo de piezas físicas...'
+      }
+    }
   },
-  'recuperacion': {
-    title: 'Recuperación de Datos',
-    description: 'Rescate de información desde discos dañados o eliminados.',
-    content: 'Aquí va toda la info detallada sobre cómo recuperamos tus archivos...'
-  },
-  'reparacion-hardware': {
-    title: 'Reparación de Hardware',
-    description: 'Cambio de pantallas, baterías, pines de carga y más.',
-    content: 'Detalles técnicos sobre reemplazo de piezas físicas...'
+  servtec: {
+    title: "Servicios Técnicos Especializados",
+    services: {
+      'cambios-led': {
+        title: 'Cambio de LED',
+        description: 'Reemplazo de luces LED en dispositivos electrónicos.',
+        content: 'Información sobre cómo realizamos el cambio de LED...'
+      },
+      'Programacion-tarjetas': {
+        title: 'Programación de Tarjetas',
+        description: 'Programación y configuración de tarjetas electrónicas.',
+        content: 'Detalles sobre el proceso de programación de tarjetas...'
+      }
+    }
   }
 };
 
-// 2. Astro requiere esta función para saber qué URLs (slugs) debe generar estáticamente
+// 2. Astro requiere esta función para generar las rutas estáticas
 export async function getStaticPaths() {
-  const services = [
-    { slug: 'formateo' },
-    { slug: 'recuperacion' },
-    { slug: 'reparacion-hardware' },
+  const allSlugs = [
+    'formateo',
+    'recuperacion',
+    'reparacion-hardware',
+    'cambios-led',
+    'Programacion-tarjetas',
   ];
 
-  return services.map((service) => {
-    return {
-      params: { slug: service.slug },
-    };
-  });
+  return allSlugs.map((slug) => ({
+    params: { slug },
+  }));
 }
 
-// 3. Obtenemos el slug de la URL actual
+// 3. Obtenemos el slug y guardamos también la clave de la categoría (servcomp o servtec)
 const { slug } = Astro.params;
-const service = servicesData[slug as keyof typeof servicesData];
 
-// Si alguien entra a una URL que no existe en el objeto, devolvemos un 404
-if (!service) {
+let foundService: Service | null = null;
+let foundCategoryKey = '';
+let foundCategoryTitle = '';
+
+for (const [catKey, catVal] of Object.entries(categories)) {
+  if (slug && catVal.services[slug]) {
+    foundService = catVal.services[slug];
+    foundCategoryKey = catKey;
+    foundCategoryTitle = catVal.title;
+    break;
+  }
+}
+
+// Si no existe el servicio, redirigimos al 404
+if (!foundService) {
   return Astro.redirect('/404');
 }
+
+const service = foundService;
+const categoryKey = foundCategoryKey;
+const categoryTitle = foundCategoryTitle;
+const currentCategory = categories[categoryKey];
 ---
 
 <Layout title={service.title}>
   <main class="max-w-4xl mx-auto p-6 space-y-8">
     
-    <!-- Navegación entre servicios (Tus "Cards" que actúan como enlaces) -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      {Object.entries(servicesData).map(([key, value]) => (
-        <a 
-          href={`/servicios/${key}`}
-          class={`p-4 rounded-xl border transition-all block ${
-            slug === key 
-              ? 'border-blue-300 dark:border-red-300 bg-blue-50/50 dark:bg-blue-950/30 ring-2 ring-blue-500/20 dark:ring-red-500/20' 
-              : 'border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:border-zinc-400'
-          }`}
-        >
-          <h3 class="font-semibold text-zinc-900 dark:text-white">{value.title}</h3>
-          <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1">{value.description}</p>
-        </a>
-      ))}
+    <!-- MENÚ CONDICIONAL: Solo muestra las tarjetas de la categoría actual del servicio -->
+    <div class="space-y-3">
+      <h2 class="text-sm font-bold uppercase tracking-wider text-zinc-400">{currentCategory.title}</h2>
+      
+      <!-- Usamos grid dinámico dependiendo de cuántos elementos tenga la categoría -->
+      <div class={`grid grid-cols-1 md:grid-cols-${Object.keys(currentCategory.services).length} gap-4`}>
+        {Object.entries(currentCategory.services).map(([key, value]) => (
+          <a 
+            href={`/servicios/${key}`}
+            class={`p-4 rounded-xl border transition-all block ${
+              slug === key 
+                ? 'border-blue-300 dark:border-red-300 bg-blue-50/50 dark:bg-blue-950/30 ring-2 ring-blue-500/20 dark:ring-red-500/20' 
+                : 'border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:border-zinc-400'
+            }`}
+          >
+            <h3 class="font-semibold text-zinc-900 dark:text-white">{value.title}</h3>
+            <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-1">{value.description}</p>
+          </a>
+        ))}
+      </div>
     </div>
 
-    <!-- Contenedor del Servicio Actual (Renderizado dinámico según la URL) -->
-    <section class="bg-zinc-50 dark:bg-zinc-900/50 p-8 rounded-2xl border border-zinc-200 dark:border-zinc-800 space-y-4 " transition:animate="slide">
+    <!-- Contenedor del Servicio Actual -->
+    <section class="bg-zinc-50 dark:bg-zinc-900/50 p-8 rounded-2xl border border-zinc-200 dark:border-zinc-800 space-y-4" transition:animate="slide">
+      <span class="text-xs font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wider">{categoryTitle}</span>
       <h1 class="text-3xl font-extrabold text-zinc-900 dark:text-white">{service.title}</h1>
       <p class="text-lg text-zinc-600 dark:text-zinc-400">{service.description}</p>
       <hr class="border-zinc-200 dark:border-zinc-800" />
